@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{JOB_NAME}}-{{PVC_NAME}}-nfs-rsync
+spec:
+  template:
+    spec:
+      restartPolicy: "Never"
+      containers:
+      - name: {{JOB_NAME}}-{{PVC_NAME}}-nfs-rsync
+        image: {{NFS_RSYNC_IMAGE}}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: NFS_SHARE
+          value: "{{NFS_SHARE}}"
+        - name: NFS_OPTIONS
+          value: "{{NFS_OPTIONS}}"
+        - name: DELETE
+          value: "{{DELETE}}"
+        - name: VERBOSE
+          value: "{{VERBOSE}}"
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: {{PVC_NAME}}
+          mountPath: /source
+      volumes:
+      - name: {{PVC_NAME}}
+        persistentVolumeClaim:
+          claimName: {{PVC_NAME}}
+
